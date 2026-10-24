@@ -115,9 +115,14 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 - A2A endpoints: `http://localhost:8000/a2a/message:send`
 
 ### 6. Live Smoke Test (Deployed Service)
-To test the live deployed agent safely without exposing credentials or calling official grading endpoints:
+The A2A Invoice Agent enforces multi-tenant principal isolation: every distinct Bearer token is automatically mapped to an isolated principal (`principal_id = f"principal_{sha256(token)[:24]}"`). No token configuration is required on the server side in Render.
+
+To run the live smoke test, generate any random token in your PowerShell session and run the test:
 ```powershell
-$env:A2A_BEARER_TOKEN = "your-secret-bearer-token"
+# Generate a secure random token and export it in your session
+$env:A2A_BEARER_TOKEN = [System.Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+
+# Run the live smoke test script
 .\.venv\Scripts\python.exe scripts/smoke_test.py
 ```
 
