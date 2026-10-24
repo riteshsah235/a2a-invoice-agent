@@ -69,6 +69,7 @@ a2a-invoice-agent/
 └── tests/
     ├── conftest.py           # In-memory test DB & fixtures
     ├── test_agent_card.py
+    ├── test_concurrency.py   # Async multi-threaded concurrency race tests
     ├── test_idempotency_and_replay.py
     ├── test_invoices_and_lifecycle.py
     ├── test_isolation_and_cancellation.py

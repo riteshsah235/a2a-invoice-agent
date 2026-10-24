@@ -33,6 +33,10 @@ venv.bak/
 .env
 .env.local
 .env.*.local
+*.pem
+*.key
+*.cert
+*.crt
 
 # SQLite Database files
 *.db
