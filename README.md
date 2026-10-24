@@ -114,6 +114,13 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 - Health check: `http://localhost:8000/healthz`
 - A2A endpoints: `http://localhost:8000/a2a/message:send`
 
+### 6. Live Smoke Test (Deployed Service)
+To test the live deployed agent safely without exposing credentials or calling official grading endpoints:
+```powershell
+$env:A2A_BEARER_TOKEN = "your-secret-bearer-token"
+.\.venv\Scripts\python.exe scripts/smoke_test.py
+```
+
 ---
 
 ## Render Deployment & Cost Optimization Guide
