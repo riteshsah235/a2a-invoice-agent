@@ -18,7 +18,7 @@ services:
           name: invoice-agent-db
           property: connectionString
       - key: BASE_URL
-        sync: false
+        value: https://a2a-invoice-agent-kkbk.onrender.com/a2a/
       - key: GEMINI_API_KEY
         sync: false
       - key: OPENAI_API_KEY

@@ -1,3 +1,4 @@
+import re
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException, status
@@ -44,6 +45,15 @@ app.add_middleware(
 
 
 @app.middleware("http")
+async def normalize_path_middleware(request: Request, call_next):
+    """Normalize consecutive slashes in the path (e.g. /a2a//tasks -> /a2a/tasks)."""
+    raw_path = request.scope.get("path", "")
+    if "//" in raw_path:
+        request.scope["path"] = re.sub(r"/+", "/", raw_path)
+    return await call_next(request)
+
+
+@app.middleware("http")
 async def enforce_payload_limit(request: Request, call_next):
     """Enforce maximum payload size limit (512 KiB per specification)."""
     content_length = request.headers.get("content-length")
@@ -61,6 +71,27 @@ app.include_router(agent_card_router)
 
 # Include Health Check: GET /healthz
 app.include_router(health_router)
+
+
+# Informational index route for GET /a2a and GET /a2a/
+@app.get("/a2a", tags=["A2A-Info"], include_in_schema=False)
+@app.get("/a2a/", tags=["A2A-Info"], include_in_schema=False)
+def a2a_base_info():
+    """Informational endpoint when the A2A base URL is inspected via browser GET."""
+    return {
+        "status": "ok",
+        "service": settings.APP_NAME,
+        "protocol": "A2A HTTP+JSON 1.0",
+        "agent_card": "/.well-known/agent-card.json",
+        "health": "/healthz",
+        "endpoints": [
+            "POST /a2a/message:send",
+            "GET /a2a/tasks/{id}",
+            "GET /a2a/tasks",
+            "POST /a2a/tasks/{id}:cancel",
+        ],
+    }
+
 
 # Include A2A routes at /a2a (standard) and at / (root fallback)
 app.include_router(a2a_router, prefix="/a2a", tags=["A2A"])

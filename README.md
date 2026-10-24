@@ -136,7 +136,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
    - Persistent PostgreSQL database (`invoice-agent-db`).
    - Python Web Service (`a2a-invoice-agent`, `free` plan) with build command `pip install -r requirements.txt && alembic upgrade head` and health check at `/healthz`.
 4. In the Web Service Environment settings on Render:
-   - Set `BASE_URL` to your public Render base URL (e.g., `https://a2a-invoice-agent.onrender.com/a2a`).
+   - `BASE_URL` is configured automatically via `render.yaml` as `https://a2a-invoice-agent-kkbk.onrender.com/a2a/`. (Verify in Render Dashboard under Environment).
    - (Optional) Set `GEMINI_API_KEY` or `OPENAI_API_KEY` if using external LLM APIs. Never commit secret keys to Git.
 
 ### Option B: Manual Service Creation
@@ -149,7 +149,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
    - Health Check Path: `/healthz`
    - Add environment variables:
      - `DATABASE_URL`: Your Render PostgreSQL Internal Connection String.
-     - `BASE_URL`: `https://<service-name>.onrender.com/a2a`
+     - `BASE_URL`: `https://a2a-invoice-agent-kkbk.onrender.com/a2a/`
 
 ---
 

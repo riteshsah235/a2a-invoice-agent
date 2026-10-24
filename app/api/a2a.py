@@ -38,6 +38,7 @@ def a2a_response(content: Dict[str, Any], status_code: int = status.HTTP_200_OK)
 
 
 @router.post("/message:send")
+@router.post("/message:send/", include_in_schema=False)
 def send_message(
     request: SendMessageRequest,
     principal_id: str = Depends(get_current_principal),
@@ -56,6 +57,7 @@ def send_message(
 
 
 @router.get("/tasks/{id}")
+@router.get("/tasks/{id}/", include_in_schema=False)
 def get_task(
     id: str,
     principal_id: str = Depends(get_current_principal),
@@ -74,6 +76,7 @@ def get_task(
 
 
 @router.get("/tasks")
+@router.get("/tasks/", include_in_schema=False)
 def list_tasks(
     principal_id: str = Depends(get_current_principal),
     db: Session = Depends(get_db),
@@ -91,6 +94,7 @@ def list_tasks(
 
 
 @router.post("/tasks/{id}:cancel")
+@router.post("/tasks/{id}:cancel/", include_in_schema=False)
 def cancel_task(
     id: str,
     principal_id: str = Depends(get_current_principal),
