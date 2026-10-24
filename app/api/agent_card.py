@@ -9,8 +9,9 @@ router = APIRouter()
 @router.get("/.well-known/agent-card.json", response_model=AgentCard)
 def get_agent_card():
     """Public Agent Card discovery endpoint (A2A 1.0)."""
-    # supportedInterfaces contains the exact submitted base URL
-    interface_url = settings.BASE_URL.rstrip("/")
+    # supportedInterfaces contains the exact submitted A2A base URL (including /a2a)
+    base_url = settings.BASE_URL.rstrip("/")
+    interface_url = base_url if base_url.endswith("/a2a") else f"{base_url}/a2a"
 
     card = AgentCard(
         name=settings.APP_NAME,

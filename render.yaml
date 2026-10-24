@@ -2,13 +2,13 @@ databases:
   - name: invoice-agent-db
     databaseName: invoice_agent
     user: invoice_user
-    plan: standard
+    plan: standard # Retained supported persistent database plan. (Note: Render's free PostgreSQL tier is non-persistent and expires after 30 days. For lowest paid persistent tier, basic-256mb at ~$7/mo can be selected).
 
 services:
   - type: web
     name: a2a-invoice-agent
     env: python
-    plan: standard
+    plan: free # Lowest-cost free tier for web service ($0/mo)
     buildCommand: "pip install -r requirements.txt && alembic upgrade head"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /healthz

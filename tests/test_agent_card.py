@@ -22,7 +22,7 @@ def test_agent_card_discovery_public(client):
     interface = data["supportedInterfaces"][0]
     assert interface["protocolBinding"] == "HTTP+JSON"
     assert interface["protocolVersion"] == "1.0"
-    assert interface["url"]
+    assert interface["url"].endswith("/a2a")
 
     # Check input and output modes
     assert "application/vnd.ga5.invoice-claim-batch+json" in data["defaultInputModes"]

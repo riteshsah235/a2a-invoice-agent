@@ -116,28 +116,40 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 ---
 
-## Render Deployment Guide
+## Render Deployment & Cost Optimization Guide
+
+### Deployment Architecture & Plans
+- **Web Service (`a2a-invoice-agent`)**:
+  - **Plan**: `free` ($0/month).
+  - Lowest-cost configuration compliant with the assignment requirements.
+  - Spins down after 15 minutes of inactivity; spins up automatically upon receiving HTTP requests.
+  - Health check path configured at `/healthz`.
+  - Binds to Render's dynamic `$PORT` environment variable.
+- **PostgreSQL Database (`invoice-agent-db`)**:
+  - **Plan in `render.yaml`**: `standard` (retained persistent plan; lowest persistent tier `basic-256mb` at ~$7/month can also be selected in Render Dashboard).
+  - **Cost Implication**: Render's free PostgreSQL tier automatically expires and deletes all data after 30 days. To ensure reliable, persistent task state, idempotency replay records, and audit log integrity across evaluation cycles, ephemeral SQLite or expiring free PostgreSQL must not be used in production. A paid persistent PostgreSQL tier (starting at ~$7/month for `basic-256mb` up to standard) is required.
 
 ### Option A: Using Render Blueprint (`render.yaml`)
 1. Push this repository to GitHub.
-2. In Render Dashboard, click **New +** -> **Blueprint**.
-3. Select your repository. Render automatically reads `render.yaml` to provision:
-   - Persistent PostgreSQL database (`invoice-agent-db`)
-   - Web service (`a2a-invoice-agent`) with build command `pip install -r requirements.txt && alembic upgrade head` and health check at `/healthz`.
+2. In the Render Dashboard, click **New +** -> **Blueprint**.
+3. Connect your repository. Render parses `render.yaml` to provision:
+   - Persistent PostgreSQL database (`invoice-agent-db`).
+   - Python Web Service (`a2a-invoice-agent`, `free` plan) with build command `pip install -r requirements.txt && alembic upgrade head` and health check at `/healthz`.
 4. In the Web Service Environment settings on Render:
-   - Set `BASE_URL` to your public Render HTTPS URL (e.g., `https://a2a-invoice-agent.onrender.com` or `https://a2a-invoice-agent.onrender.com/a2a`).
-   - (Optional) Set `GEMINI_API_KEY` or `OPENAI_API_KEY` if using external AI models.
+   - Set `BASE_URL` to your public Render base URL (e.g., `https://a2a-invoice-agent.onrender.com/a2a`).
+   - (Optional) Set `GEMINI_API_KEY` or `OPENAI_API_KEY` if using external LLM APIs. Never commit secret keys to Git.
 
 ### Option B: Manual Service Creation
-1. Create a **PostgreSQL** database on Render.
+1. Create a **PostgreSQL** database on Render (select a persistent tier such as `basic-256mb` or `standard`).
 2. Create a **Web Service** on Render:
    - Environment: `Python 3`
+   - Plan: `Free`
    - Build Command: `pip install -r requirements.txt && alembic upgrade head`
    - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
    - Health Check Path: `/healthz`
    - Add environment variables:
      - `DATABASE_URL`: Your Render PostgreSQL Internal Connection String.
-     - `BASE_URL`: `https://<service-name>.onrender.com`
+     - `BASE_URL`: `https://<service-name>.onrender.com/a2a`
 
 ---
 
