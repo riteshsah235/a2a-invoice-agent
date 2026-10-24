@@ -95,3 +95,22 @@ def test_double_slash_path_resilience(client, auth_headers):
     res = client.get("/a2a//tasks", headers=auth_headers)
     assert res.status_code == 200
     assert "tasks" in res.json()
+
+
+def test_smoke_test_url_derivation():
+    """Verify that derive_origin safely handles hostnames containing 'a2a' without stripping the host."""
+    from scripts.smoke_test import derive_origin
+
+    live_base_url = "https://a2a-invoice-agent-kkbk.onrender.com/a2a/"
+    origin = derive_origin(live_base_url)
+    assert origin == "https://a2a-invoice-agent-kkbk.onrender.com"
+    assert f"{origin}/healthz" == "https://a2a-invoice-agent-kkbk.onrender.com/healthz"
+    assert f"{origin}/.well-known/agent-card.json" == "https://a2a-invoice-agent-kkbk.onrender.com/.well-known/agent-card.json"
+    assert f"{live_base_url}message:send" == "https://a2a-invoice-agent-kkbk.onrender.com/a2a/message:send"
+
+    # Also test local dev URL
+    local_base_url = "http://localhost:8000/a2a/"
+    local_origin = derive_origin(local_base_url)
+    assert local_origin == "http://localhost:8000"
+    assert f"{local_origin}/healthz" == "http://localhost:8000/healthz"
+    assert f"{local_origin}/.well-known/agent-card.json" == "http://localhost:8000/.well-known/agent-card.json"

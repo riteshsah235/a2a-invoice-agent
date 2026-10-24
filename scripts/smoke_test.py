@@ -21,6 +21,7 @@ import uuid
 import time
 import urllib.request
 import urllib.error
+from urllib.parse import urlsplit
 from typing import Dict, Any, Tuple, Optional
 
 # Constants & Configuration
@@ -65,6 +66,12 @@ def get_base_url() -> str:
     """Read base URL from environment or fallback to default production URL."""
     base = os.environ.get("A2A_BASE_URL", DEFAULT_BASE_URL).strip()
     return base if base.endswith("/") else f"{base}/"
+
+
+def derive_origin(base_url: str) -> str:
+    """Derive service origin (scheme://netloc) safely using urllib.parse.urlsplit."""
+    parts = urlsplit(base_url.strip())
+    return f"{parts.scheme}://{parts.netloc}"
 
 
 def send_http_request(
@@ -164,7 +171,7 @@ def build_synthetic_claim_batch(batch_id: str, message_id: str) -> Dict[str, Any
 def run_smoke_test():
     token = get_token()
     base_url = get_base_url()
-    origin_url = base_url.split("/a2a")[0].rstrip("/")
+    origin_url = derive_origin(base_url)
 
     print("=" * 70)
     print("A2A INVOICE AGENT - LIVE SMOKE TEST")
