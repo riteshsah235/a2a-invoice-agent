@@ -1,0 +1,3 @@
+"""A2A Invoice Agent Application Package."""
+
+__version__ = "1.0.0"
